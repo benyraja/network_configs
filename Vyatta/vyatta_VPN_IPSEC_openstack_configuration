@@ -1,0 +1,46 @@
+Notes: The below configuration is for site1 and the same steps will be applicable for site2, but with different values. The values inside this "<< >>" will change according to the sites.
+
+Enable IPsec VPN
+# set vpn ipsec ipsec-interfaces interface
+
+Configuring an IKE(Internet Key Exchange) group
+# set vpn ipsec ike-group <<IKE Group Name>> proposal 1
+# set vpn ipsec ike-group <<IKE Group Name>> proposal 1 encryption aes256
+# set vpn ipsec ike-group <<IKE Group Name>> proposal 1 hash sha1
+# set vpn ipsec ike-group <<IKE Group Name>> proposal 2 encryption aes128
+# set vpn ipsec ike-group <<IKE Group Name>> proposal 2 hash sha1
+# set vpn ipsec ike-group <<IKE Group Name>> lifetime 3600
+
+Configuring an ESP(Encapsulated Security Payload) group
+# set vpn ipsec esp-group <<ESP Group Name>> proposal 1
+# set vpn ipsec esp-group <<ESP Group Name>> proposal 1 encryption aes256
+# set vpn ipsec esp-group <<ESP Group Name>> proposal 1 hash sha1
+# set vpn ipsec esp-group <<ESP Group Name>> proposal 2 encryption 3des
+# set vpn ipsec esp-group <<ESP Group Name>> proposal 2 hash md5
+# set vpn ipsec esp-group <<ESP Group Name>> lifetime 1800
+
+Create Connection to the other Site
+# set vpn ipsec site-to-site peer <<Remote Public IP>> authentication mode pre-shared-secret
+# edit vpn ipsec site-to-site peer <<Remote Public IP>>
+# set authentication pre-shared-secret <<Any letters which should be the same on both sites>>
+# set authentication id @Router1
+# set authentication remote-id @Router2
+The above will change on site2 vice versa.
+
+# set default-esp-group <<ESP Group Name>>
+# set ike-group <<IKE Group Name>>
+# set local-address <<Machine's Local IP address>>
+# set tunnel 1 local prefix <<Local network address eg: 10.0.0.0/24>>
+# set tunnel 1 remote prefix <<Remote network address eg: 20.0.0.0/24>>
+The above will change on site2 vice versa.
+
+# top
+# commit
+# save
+
+Below are optional settings and still in exploration stage
+
+Create NAT-networks and Enable NAT-Traversal
+# set vpn ipsec nat-networks allowed-network <<Enter the NETWORK RANGE eg:0.0.0.0/0 for all>> exclude <<Local network address eg:10.0.0.0/24>>
+# set vpn ipsec nat-traversal enable
+

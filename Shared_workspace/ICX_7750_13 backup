@@ -1,0 +1,76 @@
+SSH@ICX7750-48F Router#show running-config
+Current configuration:
+!
+ver 08.0.40aT203
+!
+stack unit 1
+  module 1 icx7750-48-xgf-port-management-module
+  module 2 icx7750-qsfp-6port-qsfp-240g-module
+!
+
+!
+!
+!
+!
+!
+vlan 1 name DEFAULT-VLAN by port
+!
+vlan 10 name projecta_vlan by port
+ tagged ethe 1/1/1 ethe 1/1/3
+ router-interface ve 10
+!
+!
+!
+!
+!
+aaa authentication login default local
+ip dhcp-server enable
+!
+ip dhcp-server pool projecta_pool
+ dhcp-default-router 10.1.1.1
+ dns-server 8.8.8.8
+ excluded-address 10.1.1.1
+ lease 1 0 0
+ network 10.1.1.0 255.255.255.0
+ deploy
+!
+!
+username cloudlab password .....
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface management 1
+ ip address 192.168.1.13 255.255.255.0
+!
+interface ethernet 1/1/1
+ no fdp enable
+ no cdp enable
+ speed-duplex 1000-full
+ no spanning-tree
+!
+interface ethernet 1/1/3
+ no fdp enable
+ no cdp enable
+ speed-duplex 1000-full
+ no spanning-tree
+!
+interface ve 10
+ ip address 10.1.1.1 255.255.255.0
+!
+!
+!
+!
+!
+lldp run
+!
+!
+!
+!
+end
+

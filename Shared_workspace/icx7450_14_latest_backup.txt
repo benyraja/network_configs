@@ -1,0 +1,117 @@
+Current configuration:
+!
+ver 08.0.40aT213
+!
+stack unit 1
+  module 1 icx7450-48p-poe-management-module
+  module 2 icx7400-xgf-4port-40g-module
+  module 3 icx7400-qsfp-1port-40g-module
+  module 4 icx7400-qsfp-1port-40g-module
+!
+!
+!
+!
+!
+vlan 1 name DEFAULT-VLAN by port
+!
+vlan 10 name projecta_vlan by port
+ tagged ethe 1/1/1
+ untagged ethe 1/1/3 ethe 1/1/5 ethe 1/1/7
+ router-interface ve 10
+!
+vlan 20 by port
+ tagged ethe 1/1/20
+ untagged ethe 1/1/15 ethe 1/1/30 to 1/1/35
+!
+!
+!
+openflow enable ofv130
+openflow controller ip-address 192.168.1.183 no-ssl port 6633
+!
+aaa authentication login default local
+!
+logging host 192.168.1.15
+username cloudlab password .....
+snmp-server community ..... ro
+snmp-server community ..... rw
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface management 1
+ ip address 192.168.1.14 255.255.255.0
+!
+interface ethernet 1/1/1
+ no fdp enable
+ no cdp enable
+ no spanning-tree
+ openflow enable layer23 hybrid-mode
+!
+interface ethernet 1/1/2
+ no fdp enable
+ no cdp enable
+ no spanning-tree
+ openflow enable layer23 hybrid-mode
+!
+interface ethernet 1/1/3
+ no fdp enable
+ no cdp enable
+ no spanning-tree
+ openflow enable layer23 hybrid-mode
+!
+interface ethernet 1/1/4
+ no fdp enable
+ no cdp enable
+ no spanning-tree
+ openflow enable layer23 hybrid-mode
+!
+interface ethernet 1/1/5
+ no fdp enable
+ no cdp enable
+ no spanning-tree
+ openflow enable layer23 hybrid-mode
+!
+interface ethernet 1/1/6
+ no fdp enable
+ no cdp enable
+ no spanning-tree
+ openflow enable layer23 hybrid-mode
+!
+interface ethernet 1/1/7
+ no fdp enable
+ no cdp enable
+ no spanning-tree
+ openflow enable layer23 hybrid-mode
+!
+interface ethernet 1/1/8
+ no fdp enable
+ no cdp enable
+ no spanning-tree
+ openflow enable layer23 hybrid-mode
+!
+interface ethernet 1/1/9
+ no fdp enable
+ no cdp enable
+ no spanning-tree
+ openflow enable layer23 hybrid-mode
+!
+interface ve 10
+ ip address 10.1.1.10 255.255.255.0
+!
+!
+!
+!
+!
+lldp run
+!
+!
+!
+!
+end
+
+
