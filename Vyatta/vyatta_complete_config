@@ -1,0 +1,281 @@
+firewall {
+
+    all-ping enable
+
+}
+
+interfaces {
+
+    ethernet eth0 {
+
+       address 182.74.92.51/27
+
+       address 182.74.92.52/27
+
+       description uplink
+
+       duplex auto
+
+       firewall {
+
+       }
+
+       hw-id ec:a8:6b:f7:c6:d9
+
+       smp_affinity auto
+
+       speed auto
+
+    }
+
+    ethernet eth1 {
+
+       address 10.1.1.1/24
+
+       duplex auto
+
+       firewall {
+
+       }
+
+       hw-id 10:fe:ed:01:3f:83
+
+       smp_affinity auto
+
+       speed auto
+
+    }
+
+}
+
+nat {
+
+    destination {
+
+       rule 1 {
+
+           description PublicIPforcloudstack
+
+           destination {
+
+               address 182.74.92.52
+
+           }
+
+           inbound-interface eth0
+
+           translation {
+
+               address 10.1.1.20
+
+           }
+
+       }
+
+    }
+
+    source {
+
+       rule 1 {
+
+           description outbound_network
+
+           outbound-interface eth0
+
+           protocol all
+
+           source {
+
+               address 10.1.1.0/24
+
+           }
+
+           translation {
+
+               address 182.74.92.51
+
+           }
+
+       }
+
+    }
+
+}
+
+protocols {
+
+    static {
+
+    }
+
+}
+
+service {
+
+    dhcp-server {
+
+       shared-network-name DHCP_Pool_ETH1 {
+
+           subnet 10.1.1.0/24 {
+
+               default-router 10.1.1.1
+
+               dns-server 8.8.8.8
+
+               start 10.1.1.200 {
+
+                   stop 10.1.1.253
+
+               }
+
+           }
+
+       }
+
+    }
+
+    https {
+
+    }
+
+    ssh {
+
+       port 29
+
+    }
+
+}
+
+system {
+
+    gateway-address 182.74.92.33
+
+    login {
+
+       user vyatta {
+
+           authentication {
+
+               encrypted-password ****************
+
+           }
+
+       }
+
+    }
+
+    name-server 8.8.8.8
+
+    syslog {
+
+       global {
+
+           facility all {
+
+               level notice
+
+           }
+
+           facility protocols {
+
+               level debug
+
+           }
+
+       }
+
+       user all {
+
+           facility all {
+
+               level emerg
+
+           }
+
+       }
+
+    }
+
+}
+
+vpn {
+
+    ipsec {
+
+       ipsec-interfaces {
+
+           interface eth0
+
+       }
+
+       nat-networks {
+
+           allowed-network 0.0.0.0/0 {
+
+           }
+
+       }
+
+       nat-traversal enable
+
+    }
+
+    l2tp {
+
+       remote-access {
+
+           authentication {
+
+               local-users {
+
+                   username beny {
+
+                       password ****************
+
+                   }
+
+                   username kk {
+
+                       password ****************
+
+                   }
+
+                   username satya {
+
+                       password ****************
+
+                   }
+
+               }
+
+               mode local
+
+           }
+
+           client-ip-pool {
+
+               start 10.1.1.190
+
+               stop 10.1.1.199
+
+           }
+
+           ipsec-settings {
+
+               authentication {
+
+                   mode pre-shared-secret
+
+                   pre-shared-secret ****************
+
+               }
+
+           }
+
+           outside-address 182.74.92.51
+
+       }
+
+    }
+
+}
