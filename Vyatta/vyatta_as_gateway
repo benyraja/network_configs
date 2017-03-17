@@ -1,0 +1,114 @@
+Configuration of Vyatta interfaces
+Below are the commands to configure the vyatta uplink interface eth0 
+
+# configure                             - Enter into configuration mode
+# set interfaces ethernet eth0 address <IPAddress of the management>
+# set interfaces ethernet eth0 description <UPLINK>
+# set interfaces ethernet eth0 speed auto             - Link speed
+# set interfaces ethernet eth0 duplex auto             - Duplex mode
+# set interfaces ethernet eth0 smp_affinity auto         - CPU interrupt affinity mask
+
+Configure the downlink interfaces eth1, eth2, etc..
+# set interfaces ethernet eth1 address <IPAddress of the VMnetwork>
+# set interfaces ethernet eth1 description <VMnetwork>
+# set interfaces ethernet eth1 speed auto             - Link speed
+# set interfaces ethernet eth1 duplex auto             - Duplex mode
+# set interfaces ethernet eth1 smp_affinity auto         - CPU interrupt affinity mask
+
+Configure the System
+Below are the commands to configure the uplink gateway and the nameserver. 
+
+# set system gateway address <gateway of the uplink>
+# set system name-server 8.8.8.8 or <any dns the customer wants to add>
+
+Configure the source NAT Rule
+Below are the commands to configure the Source NAT rules. It allows to send traffic from the VM network to Uplink.
+
+# set nat source rule <rule_number 1-9999>
+# set nat source rule <rule_number> description <source NAT rule>
+# set nat source rule <rule_number> outbound-interface eth0
+# set nat source rule <rule_number> source address <IPaddress>
+In the above command IP address can be in any format of the below. 
+<x.x.x.x>        IP address to match
+<x.x.x.x/x>          Subnet to match
+<x.x.x.x>-<x.x.x.x>    IP range to match
+!<x.x.x.x>           Match everything except the specified address
+!<x.x.x.x/x>         Match everything except the specified subnet
+!<x.x.x.x>-<x.x.x.x>     Match everything except the specified range
+# set nat source rule <rule_number> translation address <IPaddress or masquerade>
+In the above command IP address can be in any format of the below.
+<x.x.x.x>        NAT to the specified IP address
+<x.x.x.x>-<x.x.x.x>    NAT to the specified IP range
+<x.x.x.x/x>          NAT to the specified network address. Host part of the address will remain unchanged
+
+Configure the Destination NAT Rule
+Below are the commands to configure the Destination NAT rules. It allows the receive traffic from UPLINK IP (floating IP address) to the VM network IP address or one VM.
+
+# set nat destination rule <1-9999>
+# set nat destination rule <rule_number> description <destination NAT rule>
+# set nat destination rule <rule_number> inbound-interface eth0
+# set nat destination rule <rule_number> destination address <Floating IP address>
+In the above command IP address can be in any format of the below. 
+<x.x.x.x>        IP address to match
+<x.x.x.x/x>          Subnet to match
+<x.x.x.x>-<x.x.x.x>    IP range to match
+!<x.x.x.x>           Match everything except the specified address
+!<x.x.x.x/x>         Match everything except the specified subnet
+!<x.x.x.x>-<x.x.x.x>     Match everything except the specified range
+# set nat destination rule <rule_number> translation address <IPaddress or masquerade>
+In the above command IP address can be in any format of the below.
+<x.x.x.x>        NAT to the specified IP address
+<x.x.x.x>-<x.x.x.x>    NAT to the specified IP range
+<x.x.x.x/x>          NAT to the specified network address. Host part of the address will remain unchanged
+
+Configure the firewall
+We are creating two default firewalls in Vyatta to handle the inbound traffic and local vyatta traffic effectively. The ‘vyatta_firewall’ handles the inbound traffic to the DNAT rules.
+
+# set firewall name <vyatta_firewall> default-action 'drop'
+# set firewall name <vyatta_firewall> rule 10 action 'accept'
+# set firewall name <vyatta_firewall> rule 10 state established 'enable'
+# set firewall name <vyatta_firewall> rule 10 state related 'enable'
+
+The below are the local vyatta firewall configurations.
+
+# set firewall name <vyatta_local> default-action 'drop'
+# set firewall name <vyatta_local> rule 10 action 'accept'
+# set firewall name <vyatta_local> rule 10 state established 'enable'
+# set firewall name <vyatta_local> rule 10 state related 'enable'
+# set firewall name <vyatta_local> rule 20 action 'accept'
+# set firewall name <vyatta_local> rule 20 icmp type-name 'echo-request'
+# set firewall name <vyatta_local> rule 20 protocol 'icmp'
+# set firewall name <vyatta_local> rule 20 state new 'enable'
+# set firewall name <vyatta_local> rule 30 action 'accept'
+# set firewall name <vyatta_local> rule 30 destination port '22'
+# set firewall name <vyatta_local> rule 30 protocol 'tcp'
+# set firewall name <vyatta_local> rule 30 state new 'enable'
+# set firewall name <vyatta_local> rule 40 action 'accept'
+# set firewall name <vyatta_local> rule 40 destination port '80'
+# set firewall name <vyatta_local> rule 40 protocol 'tcp'
+# set firewall name <vyatta_local> rule 40 state new 'enable'
+
+
+Configure the firewall groups
+There are three types of groups. 
+Address-group     -creates a group of IP addresses
+Network-group     -creates a group of network address (cidr only)
+Port-group         -creates a group of ports
+
+Below are commands to configure the groups
+# set firewall group address-group <name> address <IP address>
+<x.x.x.x>        IPv4 address to match
+<x.x.x.x>-<x.x.x.x>    IPv4 range to match (e.g. 10.0.0.1-10.0.0.200)
+
+# set firewall group network-group <name> network <x.x.x.x/x>
+
+# set firewall group port-group <name> port <port_number>
+<name>           Named port (any name in /etc/services, e.g., http)
+<1-65535>        Numbered port
+<start>-<end>              Numbered port range (e.g. 1001-1050)
+
+Assign the firewall groups to firewall rule
+# set firewall name <vyatta_firewall> rule 30 action accept
+# set firewall name <vyatta_firewall> rule 30 destination group port-group <port_group_name>
+# set firewall name <vyatta_firewall> rule 30 source group network-group <network_group_name>
+# set firewall name <vyatta_firewall> rule 30 state new enable
